@@ -20,7 +20,7 @@
             --bg-color: #050505;      
             --accent-color: #dc6b2f;  /* Naranja Lynch */
             --text-main: #FFFFFF;     
-            --ui-opacity: 0.8;
+            --ui-opacity: 0.6;        /* Opacidad inicial de botones */
         }
 
         body, html {
@@ -47,64 +47,79 @@
             z-index: 10; 
         }
 
-        /* --- INTERFAZ MINIMALISTA (4 BOTONES) --- */
+        /* --- INTERFAZ LIMPIA (CORRECCIONES) --- */
+        
+        /* Contenedor Principal de la UI */
         .df-ui-wrapper {
             background: transparent !important;
             box-shadow: none !important;
             border: none !important;
-            padding-bottom: 40px !important;
-            display: flex !important;
-            justify-content: center !important;
+            padding-bottom: 30px !important; /* Separación del borde inferior */
             pointer-events: none; 
         }
         
+        /* Contenedor interno de los botones (Donde viven Zoom, Fullscreen e Info) */
         .df-ui-controls {
+            background: transparent !important; /* SIN FONDO */
+            box-shadow: none !important;      /* SIN SOMBRA */
+            border: none !important;          /* SIN BORDE */
+            backdrop-filter: none !important; /* SIN BLUR */
+            border-radius: 0 !important;
+            padding: 0 !important;
+            
+            /* Alineación Flex Perfecta */
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
             pointer-events: auto;
-            background: rgba(0,0,0,0.6);
-            padding: 10px 20px;
-            border-radius: 50px;
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* Botones */
+        /* Estilo de TODOS los botones (Nativos y Custom) */
         .df-ui-btn {
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
-            color: var(--text-main) !important;
+            color: #AAAAAA !important; /* Gris claro por defecto */
             border-radius: 0 !important;
-            margin: 0 15px !important;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: var(--ui-opacity);
-            width: 30px !important; 
-            height: 30px !important;
+            margin: 0 15px !important; /* Espaciado uniforme */
+            transition: all 0.3s ease;
+            width: auto !important; 
+            height: auto !important;
+            opacity: 1 !important; /* Controlamos color, no opacidad */
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
         }
         
+        /* Iconos */
         .df-ui-btn i {
-            font-size: 18px !important;
-            line-height: 30px !important;
+            font-size: 22px !important; /* Tamaño uniforme */
+            line-height: 1 !important;
+            font-weight: normal !important;
         }
 
-        /* Interacción */
+        /* Hover / Activo */
         .df-ui-btn:hover, .df-ui-btn.active, .df-ui-btn.info-active {
             color: var(--accent-color) !important;
-            opacity: 1 !important;
-            transform: scale(1.4);
-            text-shadow: 0 0 15px rgba(220, 107, 47, 0.8);
+            transform: scale(1.2);
+            text-shadow: 0 0 15px rgba(220, 107, 47, 0.6);
         }
 
-        /* OCULTAR ELEMENTOS INNECESARIOS */
-        .df-ui-prev, .df-ui-next, .df-ui-page, .df-ui-sound, .df-ui-share, .df-ui-more {
+        /* --- OCULTAR ELEMENTOS NO DESEADOS --- */
+        /* Ocultar botones extra de navegación, sonido, share, etc. */
+        .df-ui-prev, .df-ui-next, .df-ui-page, .df-ui-sound, .df-ui-share, .df-ui-more, .df-ui-outline, .df-ui-help {
             display: none !important; 
         }
+        /* Regla extra para asegurar que NO salga nada en la esquina superior */
+        .df-ui-wrapper.df-ui-top { display: none !important; } 
 
-        /* --- VENTANA MODAL INFO --- */
+
+        /* --- VENTANA MODAL INFO (ESTILO STUPOR) --- */
         .modal-overlay {
             display: none; 
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 5, 5, 0.96); 
+            background: rgba(0, 0, 0, 0.98); /* Fondo casi negro total */
             z-index: 9999;
             justify-content: center;
             align-items: center;
@@ -113,38 +128,92 @@
         }
         .modal-overlay.show { display: flex; opacity: 1; }
 
+        /* Contenido SIN recuadro, solo texto flotante */
         .modal-content {
             color: #fff;
-            max-width: 600px;
-            width: 85%;
+            max-width: 700px;
+            width: 90%;
             text-align: center;
             position: relative;
-            border: 1px solid #222;
-            padding: 40px;
-            background: #0a0a0a;
-            box-shadow: 0 0 50px rgba(0,0,0,1);
-        }
-        .modal-line { width: 60px; height: 3px; background-color: var(--accent-color); margin: 25px auto; }
-        .modal-title { font-size: 32px; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 4px; }
-        .modal-subtitle { font-size: 12px; color: var(--accent-color); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 3px; font-weight: 600; }
-        .modal-role { font-size: 11px; color: #888; margin-top: 30px; letter-spacing: 1px; text-transform: uppercase;}
-        
-        .modal-author { 
-            color: white; 
-            font-size: 18px; 
-            letter-spacing: 1px; 
-            margin-top: 10px; 
-            font-weight: 600; 
+            background: transparent; /* Transparente */
+            border: none;            /* Sin borde */
+            box-shadow: none;        /* Sin sombra */
+            padding: 20px;
         }
 
-        .modal-year { font-size: 14px; color: #666; margin-top: 5px; }
-        .modal-note { margin-top: 40px; font-size: 11px; color: #555; border-top: 1px solid #222; padding-top: 20px; line-height: 1.5; }
+        /* Tipografía Modal */
+        .modal-title { 
+            font-size: 36px; 
+            font-weight: 800; 
+            margin-bottom: 5px; 
+            text-transform: uppercase; 
+            letter-spacing: 4px; 
+            color: #FFFFFF;
+        }
+        .modal-subtitle { 
+            font-size: 13px; 
+            color: var(--accent-color); 
+            margin-bottom: 25px; 
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+            font-weight: 700; 
+        }
         
+        .modal-line { 
+            width: 40px; 
+            height: 2px; 
+            background-color: var(--accent-color); 
+            margin: 30px auto; 
+            opacity: 0.8;
+        }
+
+        .modal-role { 
+            font-size: 12px; 
+            color: #999; 
+            margin-top: 10px; 
+            letter-spacing: 1px; 
+            text-transform: uppercase;
+        }
+        
+        .modal-author { 
+            color: #FFFFFF; 
+            font-size: 18px; 
+            letter-spacing: 1px; 
+            margin-top: 5px; 
+            font-weight: 700; 
+        }
+
+        .modal-year { 
+            font-size: 14px; 
+            color: #777; 
+            margin-top: 5px; 
+            font-weight: 300;
+        }
+
+        .modal-note { 
+            margin-top: 60px; 
+            font-size: 11px; 
+            color: #444; 
+            line-height: 1.6; 
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Botón cerrar sutil (X) */
         .close-modal { 
-            position: absolute; top: 15px; right: 20px; 
-            color: #444; font-size: 30px; cursor: pointer; transition: 0.2s; 
+            position: absolute; 
+            top: 0; right: 0; 
+            color: #333; 
+            font-size: 24px; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            font-family: sans-serif;
+            font-weight: 100;
         }
         .close-modal:hover { color: var(--accent-color); }
+
+        /* Icono info */
         .ti-info-custom:before { content: "\e645"; } 
 
     </style>
@@ -154,10 +223,10 @@
     <!-- FONDO -->
     <div id="grained-container"></div>
 
-    <!-- MODAL INFO -->
+    <!-- MODAL INFO (Estilo STUPOR) -->
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
-            <span class="close-modal" onclick="toggleInfo()">&times;</span>
+            <span class="close-modal" onclick="toggleInfo()">✕</span>
             
             <div class="modal-title">DAVID LYNCH</div>
             <div class="modal-subtitle">DECODIFICACIÓN FÍLMICA [INFOGRAFÍA]</div>
@@ -199,7 +268,7 @@
         // 2. FUNCIONES MODAL
         function toggleInfo() {
             var modal = document.getElementById('infoModal');
-            var btn = document.getElementById('btn-info-custom');
+            var btn = document.querySelector('.df-ui-custom-info'); // Selector actualizado
             
             if (modal.classList.contains('show')) {
                 modal.classList.remove('show');
@@ -215,50 +284,46 @@
             if (event.target == document.getElementById('infoModal')) toggleInfo();
         }
 
-        // 3. INICIAR VISOR PARA PNG
+        // 3. INICIAR VISOR
         jQuery(document).ready(function() {
             
-            // NOMBRE DEL ARCHIVO PNG
             var imageName = "FILMOGRAFIADAVIDLYNCH_InfografiaCompleta_WEB-FINAL_v01_18122025.png";
 
             var bookOptions = {
-                // NOTA IMPORTANTE: Para imágenes, 'source' debe ser un ARRAY (lista), no un string.
                 source: [imageName],
-                
                 height: "100%",
-                
-                // MODO IMAGEN / INFOGRAFÍA
                 webgl: true,            
-                singlePageMode: true,   // Una sola cara
+                singlePageMode: true,
                 hard: "none",           
                 
-                // ZOOM PROFUNDO PARA DETALLES
                 maxZoom: 8,             
                 zoomRatio: 0.5,         
                 
                 backgroundColor: "transparent",
                 disableFolderPath: true, 
 
-                // Textos UI
-                text: {
-                    toggleFullscreen: "FULL",
-                    zoomIn: "ZOOM +",
-                    zoomOut: "ZOOM -"
-                },
+                // Textos vacíos porque usamos iconos
+                text: { toggleFullscreen: "", zoomIn: "", zoomOut: "" },
                 
-                // SOLO 3 BOTONES NATIVOS (El de info se agrega por código)
+                // Controles Nativos
                 allControls: "zoomIn,zoomOut,fullScreen",
-                hideControls: "share,download,more,pageNumber,play,outline,thumbnail,altPrev,altNext",
+                // OCULTAMOS TODO LO DEMÁS EXPLICITAMENTE
+                hideControls: "share,download,more,pageNumber,play,outline,thumbnail,altPrev,altNext,help",
 
                 onReady: function(scene) {
-                    // Inyectar botón Info
-                    var infoBtn = $('<div class="df-ui-btn df-ui-info" id="btn-info-custom" title="INFORMACIÓN"><i class="ti-info-alt"></i></div>');
+                    // --- CORRECCIÓN DE ALINEACIÓN ---
+                    // Creamos el botón con la misma clase exacta que los nativos
+                    var infoBtn = $('<div class="df-ui-btn df-ui-custom-info" title="INFORMACIÓN"><i class="ti-info-alt"></i></div>');
                     infoBtn.on('click', function() { toggleInfo(); });
                     
-                    var controls = $('.df-ui-wrapper .df-ui-controls'); 
-                    if(controls.length > 0) { 
-                        controls.append(infoBtn); 
+                    // Inyectamos el botón DENTRO del contenedor de controles (.df-ui-controls)
+                    // Esto asegura que Flexbox lo alinee igual que los demás.
+                    var controlsContainer = $('.df-ui-controls');
+                    
+                    if(controlsContainer.length > 0) {
+                        controlsContainer.append(infoBtn);
                     } else {
+                        // Fallback por si la estructura cambia, pero intentamos mantener flex
                         $('.df-ui-wrapper').append(infoBtn);
                     }
                 }
