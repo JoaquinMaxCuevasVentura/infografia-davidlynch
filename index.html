@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- ICONOS (RESTALECIDO EL ENLACE ORIGINAL QUE SÍ FUNCIONA) -->
+    <!-- ICONOS -->
     <link href="https://cdn.jsdelivr.net/npm/dflip/css/themify-icons.min.css" rel="stylesheet" type="text/css">
 
     <style>
@@ -28,13 +28,13 @@
             overflow: hidden;
         }
 
-        /* FONDO (Ruido) */
+        /* FONDO */
         #grained-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 0; pointer-events: none;
         }
 
-        /* VISOR (OpenSeadragon) */
+        /* VISOR */
         #openseadragon-viewer {
             width: 100%;
             height: 100%;
@@ -44,29 +44,31 @@
             z-index: 10;
         }
 
-        /* --- BARRA DE HERRAMIENTAS PERSONALIZADA --- */
+        /* --- BARRA DE HERRAMIENTAS (AJUSTE FINO STUPOR) --- */
         #custom-toolbar {
             position: fixed;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 9999; /* Z-Index muy alto para asegurar visibilidad */
+            z-index: 9999;
             display: flex;
             align-items: center;
             justify-content: center;
             background: transparent;
             padding: 0;
-            gap: 20px;
+            
+            /* Espaciado idéntico a la referencia Stupor */
+            gap: 25px; 
         }
 
         /* Estilo Botones */
         .custom-btn {
             background: transparent;
             border: none;
-            color: #AAAAAA;
+            color: #AAAAAA; /* Gris suave */
             cursor: pointer;
-            width: 40px;  
-            height: 40px; 
+            width: auto;  
+            height: 30px; /* Altura fija para alineación vertical */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -77,17 +79,23 @@
             pointer-events: auto;
         }
 
-        /* Iconos */
+        /* TAMAÑO Y ALINEACIÓN DE ICONOS */
         .custom-btn i {
-            font-size: 24px; 
+            font-size: 20px; /* Tamaño base más fino */
             line-height: 1;
-            display: block; /* Asegurar renderizado */
+            display: block;
+            font-weight: normal;
         }
 
-        /* Ajuste óptico icono INFO */
-        #btn-info i { font-size: 20px; }
+        /* CORRECCIÓN ÓPTICA: El icono 'i' suele verse más grande ópticamente.
+           Lo reducimos ligeramente y lo subimos 1px para centrarlo perfecto con las lupas. */
+        #btn-info i { 
+            font-size: 17px; 
+            position: relative;
+            top: -1px;
+        }
 
-        /* Hover / Active */
+        /* Hover */
         .custom-btn:hover, .custom-btn.active {
             color: var(--accent-color);
             transform: scale(1.2);
@@ -99,7 +107,7 @@
             display: none; 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.98); 
-            z-index: 10000; /* Por encima de todo */
+            z-index: 10000; 
             justify-content: center; align-items: center;
             opacity: 0; transition: opacity 0.3s ease;
         }
@@ -141,7 +149,7 @@
                 <strong style="color:white; font-size:15px; letter-spacing:1px;">Joaquin Max Cuevas Ventura</strong><br>
                 2021</p>
                 <div class="modal-note">
-                    Nota: Este fue un ejercicio de diseño de información, por lo que esta publicación constituye un proyecto académico exento de cualquier propósito comercial o de lucro.
+                    Nota: Este fue un ejercicio de diseño de información, por lo que esta publicación constituye un proyecto académico con fines pedagógicos y de exhibición de portafolio, exento de cualquier propósito comercial o de lucro.
                 </div>
             </div>
         </div>
@@ -155,7 +163,7 @@
         <button class="custom-btn" id="btn-info" title="Información"><i class="ti-info-alt"></i></button>
     </div>
 
-    <!-- CONTENEDOR VISOR -->
+    <!-- VISOR -->
     <div id="openseadragon-viewer"></div>
 
     <!-- SCRIPTS -->
@@ -197,7 +205,7 @@
 
         var viewer = OpenSeadragon({
             id: "openseadragon-viewer",
-            prefixUrl: "", // Sin imágenes de iconos por defecto
+            prefixUrl: "", 
             
             tileSources: {
                 type: 'image',
@@ -222,20 +230,16 @@
         });
 
         // 4. VINCULACIÓN DE BOTONES
-        
-        // Zoom +
         document.getElementById('btn-zoom-in').addEventListener('click', function() {
             var currentZoom = viewer.viewport.getZoom();
             viewer.viewport.zoomTo(currentZoom * 1.5);
         });
 
-        // Zoom -
         document.getElementById('btn-zoom-out').addEventListener('click', function() {
             var currentZoom = viewer.viewport.getZoom();
             viewer.viewport.zoomTo(currentZoom / 1.5);
         });
 
-        // Fullscreen
         document.getElementById('btn-full').addEventListener('click', function() {
             viewer.setFullScreen(!viewer.isFullScreen());
         });
