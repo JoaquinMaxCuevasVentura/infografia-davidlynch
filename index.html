@@ -13,6 +13,9 @@
     <!-- ICONOS -->
     <link href="https://cdn.jsdelivr.net/npm/dflip/css/themify-icons.min.css" rel="stylesheet" type="text/css">
 
+    <!-- LIBRERÍA OCR (TESSERACT) -->
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js'></script>
+
     <style>
         /* --- VARIABLES --- */
         :root {
@@ -36,71 +39,63 @@
 
         /* VISOR */
         #openseadragon-viewer {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             background: transparent;
-            position: absolute;
-            top: 0; left: 0;
+            position: absolute; top: 0; left: 0;
             z-index: 10;
         }
 
-        /* --- BARRA DE HERRAMIENTAS (AJUSTE FINO STUPOR) --- */
+        /* --- BARRA DE HERRAMIENTAS --- */
         #custom-toolbar {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
+            position: fixed; bottom: 30px; left: 50%;
             transform: translateX(-50%);
             z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            padding: 0;
-            
-            /* Espaciado idéntico a la referencia Stupor */
+            display: flex; align-items: center; justify-content: center;
+            background: transparent; padding: 0;
             gap: 25px; 
         }
 
-        /* Estilo Botones */
         .custom-btn {
-            background: transparent;
-            border: none;
-            color: #AAAAAA; /* Gris suave */
-            cursor: pointer;
-            width: auto;  
-            height: 30px; /* Altura fija para alineación vertical */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            padding: 0;
-            outline: none;
-            position: relative; 
-            pointer-events: auto;
+            background: transparent; border: none;
+            color: #AAAAAA; cursor: pointer;
+            width: auto; height: 30px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease; padding: 0; outline: none;
+            position: relative; pointer-events: auto;
         }
 
-        /* TAMAÑO Y ALINEACIÓN DE ICONOS */
         .custom-btn i {
-            font-size: 20px; /* Tamaño base más fino */
-            line-height: 1;
-            display: block;
-            font-weight: normal;
+            font-size: 20px; line-height: 1;
+            display: block; font-weight: normal;
         }
 
-        /* CORRECCIÓN ÓPTICA: El icono 'i' suele verse más grande ópticamente.
-           Lo reducimos ligeramente y lo subimos 1px para centrarlo perfecto con las lupas. */
-        #btn-info i { 
-            font-size: 17px; 
-            position: relative;
-            top: -1px;
-        }
+        /* Ajustes ópticos de iconos */
+        #btn-info i { font-size: 17px; position: relative; top: -1px; }
+        #btn-ocr i { font-size: 18px; position: relative; top: 0px; }
 
-        /* Hover */
         .custom-btn:hover, .custom-btn.active {
             color: var(--accent-color);
             transform: scale(1.2);
             text-shadow: 0 0 15px rgba(220, 107, 47, 0.6);
         }
+
+        /* --- LOADING OCR (NUEVO) --- */
+        #ocr-loading {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(5, 5, 5, 0.95);
+            color: var(--accent-color);
+            padding: 30px 50px;
+            border: 1px solid #333;
+            z-index: 10001;
+            display: none; /* Oculto por defecto */
+            flex-direction: column; align-items: center; gap: 15px;
+            font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+            font-weight: 600;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+        .blink { animation: blinker 1.5s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0.4; } }
 
         /* --- MODAL INFO --- */
         .modal-overlay {
@@ -137,20 +132,21 @@
     <!-- FONDO -->
     <div id="grained-container"></div>
 
-    <!-- MODAL INFO -->
+    <!-- INDICADOR DE CARGA (OCR) -->
+    <div id="ocr-loading">
+        <i class="ti-eye blink" style="font-size: 24px;"></i>
+        <span>Procesando...</span>
+    </div>
+
+    <!-- MODAL (INFO + RESULTADOS) -->
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
-            <span class="close-modal" onclick="toggleInfo()">✕</span>
-            <div class="modal-title">DAVID LYNCH</div>
-            <div class="modal-subtitle">DECODIFICACIÓN FÍLMICA [INFOGRAFÍA]</div>
+            <span class="close-modal" id="btn-close-modal">✕</span>
+            <div class="modal-title" id="modal-title">DAVID LYNCH</div>
+            <div class="modal-subtitle" id="modal-subtitle">DECODIFICACIÓN FÍLMICA [INFOGRAFÍA]</div>
             <div class="modal-line"></div>
-            <div class="modal-body">
-                <p>INVESTIGACIÓN, REDACCIÓN E ILUSTRACIÓN<br>
-                <strong style="color:white; font-size:15px; letter-spacing:1px;">Joaquin Max Cuevas Ventura</strong><br>
-                2021</p>
-                <div class="modal-note">
-                    Nota: Este fue un ejercicio de diseño de información, por lo que esta publicación constituye un proyecto académico exento de cualquier propósito comercial o de lucro.
-                </div>
+            <div class="modal-body" id="modal-body">
+                <!-- El contenido se llena dinámicamente con JS -->
             </div>
         </div>
     </div>
@@ -160,6 +156,10 @@
         <button class="custom-btn" id="btn-zoom-in" title="Acercar"><i class="ti-zoom-in"></i></button>
         <button class="custom-btn" id="btn-zoom-out" title="Alejar"><i class="ti-zoom-out"></i></button>
         <button class="custom-btn" id="btn-full" title="Pantalla Completa"><i class="ti-fullscreen"></i></button>
+        
+        <!-- BOTÓN DE OCR/TRADUCCIÓN -->
+        <button class="custom-btn" id="btn-ocr" title="Escanear y Traducir Vista Actual"><i class="ti-text"></i></button>
+        
         <button class="custom-btn" id="btn-info" title="Información"><i class="ti-info-alt"></i></button>
     </div>
 
@@ -172,7 +172,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
 
     <script>
-        // 1. GRANULADO
+        // --- 1. CONFIGURACIÓN VISUAL ---
         try {
             grained('#grained-container', {
                 "animate": true, "patternWidth": 100, "patternHeight": 100,
@@ -180,68 +180,170 @@
             });
         } catch(e) { console.log("Error cargando grano"); }
 
-        // 2. LÓGICA MODAL
-        function toggleInfo() {
-            var modal = document.getElementById('infoModal');
-            var btn = document.getElementById('btn-info');
-            
-            if (modal.classList.contains('show')) {
-                modal.classList.remove('show');
-                setTimeout(function() { modal.style.display = 'none'; }, 300); 
-                btn.classList.remove('active');
-            } else {
-                modal.style.display = 'flex';
-                setTimeout(function() { modal.classList.add('show'); }, 10);
-                btn.classList.add('active');
+        // --- 2. GESTIÓN DEL MODAL ---
+        const modal = document.getElementById('infoModal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalSubtitle = document.getElementById('modal-subtitle');
+        const modalBody = document.getElementById('modal-body');
+        const btnInfo = document.getElementById('btn-info');
+        const btnClose = document.getElementById('btn-close-modal');
+
+        // Contenido por defecto (Información del Proyecto)
+        const defaultInfoHTML = `
+            <p>INVESTIGACIÓN, REDACCIÓN E ILUSTRACIÓN<br>
+            <strong style="color:white; font-size:15px; letter-spacing:1px;">Joaquin Max Cuevas Ventura</strong><br>
+            2021</p>
+            <div class="modal-note">
+                Nota: Este fue un ejercicio de diseño de información, por lo que esta publicación constituye un proyecto académico exento de cualquier propósito comercial o de lucro.
+            </div>
+        `;
+
+        function openModal(mode, textData = {}) {
+            // Configurar contenido según modo
+            if (mode === 'info') {
+                modalTitle.innerText = "DAVID LYNCH";
+                modalSubtitle.innerText = "DECODIFICACIÓN FÍLMICA [INFOGRAFÍA]";
+                modalBody.innerHTML = defaultInfoHTML;
+            } else if (mode === 'ocr') {
+                modalTitle.innerText = "ANÁLISIS DE TEXTO";
+                modalSubtitle.innerText = "OCR & LIBRETRANSLATE";
+                
+                const colorTrans = textData.isError ? '#ff5555' : '#aaaaaa';
+                
+                modalBody.innerHTML = `
+                    <div style="text-align: left; margin-bottom: 25px;">
+                        <strong style="color:var(--accent-color); font-size:11px; letter-spacing:1px;">ORIGINAL (ES):</strong><br>
+                        <p style="font-size: 13px; color: #fff; margin-top:5px; white-space: pre-wrap;">${textData.original}</p>
+                    </div>
+                    <div style="border-top: 1px solid #333; padding-top: 20px; text-align: left;">
+                        <strong style="color:var(--accent-color); font-size:11px; letter-spacing:1px;">TRADUCCIÓN (EN):</strong><br>
+                        <p style="font-size: 13px; color: ${colorTrans}; margin-top:5px; white-space: pre-wrap;">${textData.translated}</p>
+                    </div>
+                `;
             }
-        }
-        document.getElementById('btn-info').onclick = toggleInfo;
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('infoModal')) toggleInfo();
+            
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+            if(mode === 'info') btnInfo.classList.add('active');
         }
 
-        // 3. INICIAR VISOR OPENSEADRAGON
+        function closeModal() {
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+            btnInfo.classList.remove('active');
+        }
+
+        // Eventos Modal
+        btnInfo.onclick = () => {
+            if (modal.classList.contains('show') && btnInfo.classList.contains('active')) {
+                closeModal();
+            } else {
+                openModal('info');
+            }
+        };
+        btnClose.onclick = closeModal;
+        window.onclick = (e) => { if (e.target == modal) closeModal(); }
+
+
+        // --- 3. OPENSEADRAGON ---
         var imageName = "FILMOGRAFIADAVIDLYNCH_InfografiaCompleta_WEB-FINAL_v01_18122025.png";
 
         var viewer = OpenSeadragon({
             id: "openseadragon-viewer",
             prefixUrl: "", 
-            
             tileSources: {
-                type: 'image',
-                url:  imageName,
-                buildPyramid: false
+                type: 'image', url: imageName, buildPyramid: false
             },
-
-            // Configuración
             showNavigationControl: false,
-            wrapHorizontal: false,
-            wrapVertical: false,
-            visibilityRatio: 0.5,
-            minZoomImageRatio: 0.5,
-            maxZoomPixelRatio: 5,        
+            wrapHorizontal: false, wrapVertical: false,
+            visibilityRatio: 0.5, minZoomImageRatio: 0.5, maxZoomPixelRatio: 5,        
             defaultZoomLevel: 0,         
-            
-            gestureSettingsMouse: {
-                clickToZoom: false,
-                scrollToZoom: true
-            },
+            gestureSettingsMouse: { clickToZoom: false, scrollToZoom: true },
             animationTime: 0.4
         });
 
-        // 4. VINCULACIÓN DE BOTONES
-        document.getElementById('btn-zoom-in').addEventListener('click', function() {
-            var currentZoom = viewer.viewport.getZoom();
-            viewer.viewport.zoomTo(currentZoom * 1.5);
+        // Botones de Navegación
+        document.getElementById('btn-zoom-in').addEventListener('click', () => {
+            viewer.viewport.zoomTo(viewer.viewport.getZoom() * 1.5);
         });
-
-        document.getElementById('btn-zoom-out').addEventListener('click', function() {
-            var currentZoom = viewer.viewport.getZoom();
-            viewer.viewport.zoomTo(currentZoom / 1.5);
+        document.getElementById('btn-zoom-out').addEventListener('click', () => {
+            viewer.viewport.zoomTo(viewer.viewport.getZoom() / 1.5);
         });
-
-        document.getElementById('btn-full').addEventListener('click', function() {
+        document.getElementById('btn-full').addEventListener('click', () => {
             viewer.setFullScreen(!viewer.isFullScreen());
+        });
+
+
+        // --- 4. LÓGICA OCR Y TRADUCCIÓN (LibreTranslate) ---
+        const btnOcr = document.getElementById('btn-ocr');
+        const loadingEl = document.getElementById('ocr-loading');
+
+        // Función Auxiliar: Traducir
+        async function translateText(text) {
+            // URL de instancia pública (Puede cambiar o saturarse)
+            // Alternativas: https://libretranslate.de/translate , https://translate.argosopentech.com/translate
+            const API_URL = "https://libretranslate.de/translate"; 
+            
+            try {
+                const res = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        q: text,
+                        source: "es",
+                        target: "en",
+                        format: "text"
+                    }),
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                if(!res.ok) throw new Error("Error HTTP " + res.status);
+                
+                const data = await res.json();
+                return data.translatedText;
+            } catch (err) {
+                console.warn("Fallo en traducción:", err);
+                return "[ERROR DE CONEXIÓN] El servidor de traducción gratuito no responde o bloqueó la solicitud (CORS). Intenta de nuevo más tarde o revisa la consola.";
+            }
+        }
+
+        btnOcr.addEventListener('click', async function() {
+            // UI: Mostrar carga
+            loadingEl.style.display = 'flex';
+            
+            try {
+                // 1. Obtener imagen del Canvas actual
+                var canvas = viewer.drawer.canvas;
+                var dataUrl = canvas.toDataURL("image/png");
+
+                // 2. Ejecutar Tesseract (OCR)
+                // Descargará el módulo la primera vez
+                const result = await Tesseract.recognize(dataUrl, 'spa');
+                const textDetectado = result.data.text;
+
+                // Validación simple
+                if (!textDetectado || textDetectado.trim().length < 2) {
+                    alert("No se detectó texto legible. Haz zoom sobre un párrafo e intenta de nuevo.");
+                    loadingEl.style.display = 'none';
+                    return;
+                }
+
+                // 3. Traducir
+                const textTraducido = await translateText(textDetectado);
+                const isError = textTraducido.includes("[ERROR");
+
+                // 4. Mostrar Resultados
+                loadingEl.style.display = 'none';
+                openModal('ocr', { 
+                    original: textDetectado, 
+                    translated: textTraducido,
+                    isError: isError
+                });
+
+            } catch (error) {
+                console.error(error);
+                loadingEl.style.display = 'none';
+                alert("Ocurrió un error al procesar la imagen.");
+            }
         });
 
     </script>
