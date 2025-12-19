@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DAVID LYNCH | Infografía fílmica</title>
+    <title>DAVID LYNCH | Infografía</title>
 
     <!-- 1. FUENTE ARCHIVO -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,18 +53,18 @@
             box-shadow: none !important;
             border: none !important;
             padding-bottom: 40px !important;
-            /* Centrar los botones */
             display: flex !important;
             justify-content: center !important;
-            pointer-events: none; /* Para que el click pase al canvas si no es botón */
+            pointer-events: none; 
         }
         
         .df-ui-controls {
             pointer-events: auto;
-            background: rgba(0,0,0,0.5); /* Fondo sutil para legibilidad */
+            background: rgba(0,0,0,0.6);
             padding: 10px 20px;
             border-radius: 50px;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         /* Botones */
@@ -74,14 +74,13 @@
             box-shadow: none !important;
             color: var(--text-main) !important;
             border-radius: 0 !important;
-            margin: 0 15px !important; /* Más espacio entre botones */
+            margin: 0 15px !important;
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: var(--ui-opacity);
             width: 30px !important; 
             height: 30px !important;
         }
         
-        /* Iconos más grandes para visualización limpia */
         .df-ui-btn i {
             font-size: 18px !important;
             line-height: 30px !important;
@@ -95,7 +94,7 @@
             text-shadow: 0 0 15px rgba(220, 107, 47, 0.8);
         }
 
-        /* OCULTAR ELEMENTOS INNECESARIOS PARA INFOGRAFÍA */
+        /* OCULTAR ELEMENTOS INNECESARIOS */
         .df-ui-prev, .df-ui-next, .df-ui-page, .df-ui-sound, .df-ui-share, .df-ui-more {
             display: none !important; 
         }
@@ -138,12 +137,7 @@
             font-weight: 600; 
         }
 
-        .modal-year {
-            font-size: 14px;
-            color: #666;
-            margin-top: 5px;
-        }
-
+        .modal-year { font-size: 14px; color: #666; margin-top: 5px; }
         .modal-note { margin-top: 40px; font-size: 11px; color: #555; border-top: 1px solid #222; padding-top: 20px; line-height: 1.5; }
         
         .close-modal { 
@@ -151,8 +145,6 @@
             color: #444; font-size: 30px; cursor: pointer; transition: 0.2s; 
         }
         .close-modal:hover { color: var(--accent-color); }
-
-        /* Ajuste del icono de info */
         .ti-info-custom:before { content: "\e645"; } 
 
     </style>
@@ -162,7 +154,7 @@
     <!-- FONDO -->
     <div id="grained-container"></div>
 
-    <!-- MODAL INFO (Actualizado con datos de David Lynch) -->
+    <!-- MODAL INFO -->
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-modal" onclick="toggleInfo()">&times;</span>
@@ -187,13 +179,11 @@
 
     <!-- 3. SCRIPTS -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <!-- dFlip -->
     <script src="https://cdn.jsdelivr.net/npm/dflip/js/dflip.min.js"></script>
-    <!-- Grained -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/grained/0.0.2/grained.min.js"></script>
 
     <script>
-        // 1. INICIAR EL GRANO (Fondo)
+        // 1. INICIAR EL GRANO
         try {
             grained('#grained-container', {
                 "animate": true,
@@ -225,49 +215,47 @@
             if (event.target == document.getElementById('infoModal')) toggleInfo();
         }
 
-        // 3. INICIAR VISOR DE INFOGRAFÍA
+        // 3. INICIAR VISOR PARA PNG
         jQuery(document).ready(function() {
             
-            // NOMBRE EXACTO DEL ARCHIVO
-            var pdfName = "FILMOGRAFIADAVIDLYNCH_InfografiaCompleta_WEB-FINAL_v01_18122025.png";
+            // NOMBRE DEL ARCHIVO PNG
+            var imageName = "FILMOGRAFIADAVIDLYNCH_InfografiaCompleta_WEB-FINAL_v01_18122025.png";
 
             var bookOptions = {
-                source: pdfName,
+                // NOTA IMPORTANTE: Para imágenes, 'source' debe ser un ARRAY (lista), no un string.
+                source: [imageName],
+                
                 height: "100%",
                 
-                // --- CONFIGURACIÓN PARA INFOGRAFÍA DE ALTO DETALLE ---
-                webgl: true,            // Rendimiento suave
-                singlePageMode: true,   // IMPORTANTE: Muestra todo como un solo plano, no como libro
-                hard: "none",           // Sin efecto de tapa dura
+                // MODO IMAGEN / INFOGRAFÍA
+                webgl: true,            
+                singlePageMode: true,   // Una sola cara
+                hard: "none",           
                 
-                // Zoom Profundo (dFlip permite aumentar el factor de escala)
-                maxZoom: 8,             // Permite hacer zoom x8 veces (estándar es 2)
-                zoomRatio: 0.5,         // Pasos de zoom más controlados
+                // ZOOM PROFUNDO PARA DETALLES
+                maxZoom: 8,             
+                zoomRatio: 0.5,         
                 
                 backgroundColor: "transparent",
                 disableFolderPath: true, 
 
-                // Textos UI (aunque usamos iconos)
+                // Textos UI
                 text: {
                     toggleFullscreen: "FULL",
                     zoomIn: "ZOOM +",
                     zoomOut: "ZOOM -"
                 },
                 
-                // LIMITAMOS LOS CONTROLES NATIVOS A SOLO 3 (El 4to lo inyectamos)
+                // SOLO 3 BOTONES NATIVOS (El de info se agrega por código)
                 allControls: "zoomIn,zoomOut,fullScreen",
                 hideControls: "share,download,more,pageNumber,play,outline,thumbnail,altPrev,altNext",
 
                 onReady: function(scene) {
-                    // Inyectar botón Info personalizado
-                    // Nota: Usamos append para que quede al final (Zoom+, Zoom-, Full, Info)
-                    var infoBtn = $('<div class="df-ui-btn df-ui-info" id="btn-info-custom" title="INFORMACIÓN DEL PROYECTO"><i class="ti-info-alt"></i></div>');
+                    // Inyectar botón Info
+                    var infoBtn = $('<div class="df-ui-btn df-ui-info" id="btn-info-custom" title="INFORMACIÓN"><i class="ti-info-alt"></i></div>');
                     infoBtn.on('click', function() { toggleInfo(); });
                     
-                    // Buscamos el contenedor de controles y añadimos el botón
                     var controls = $('.df-ui-wrapper .df-ui-controls'); 
-                    // dFlip a veces no crea el .df-ui-controls interior dependiendo de la versión,
-                    // si no existe, lo agregamos al wrapper directo.
                     if(controls.length > 0) { 
                         controls.append(infoBtn); 
                     } else {
