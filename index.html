@@ -10,14 +10,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    <!-- 2. ICONOS (Los mismos que usa dFlip en tus otros proyectos) -->
+    <!-- 2. ICONOS Y ESTILOS -->
     <link href="https://cdn.jsdelivr.net/npm/themify-icons.min.css" rel="stylesheet" type="text/css">
-    
-    <!-- 3. ESTILOS TIPPY -->
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale.css"/>
 
     <style>
-        /* --- SISTEMA DE DISEÑO (LYNCH) --- */
         :root {
             --bg-color: #050505;      
             --accent-color: #dc6b2f;
@@ -26,108 +23,102 @@
         }
 
         body, html {
-            height: 100%;
-            margin: 0;
-            padding: 0;
+            height: 100%; width: 100%; margin: 0; padding: 0;
             background-color: var(--bg-color);
             font-family: 'Archivo', sans-serif !important;
             overflow: hidden; 
         }
 
-        /* Grano de fondo */
         #grained-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1; pointer-events: none;
         }
 
-        /* --- CONTENEDOR IMAGEN (ZOOM) --- */
-        #panzoom-container {
+        /* --- CONTENEDOR PRINCIPAL --- */
+        #panzoom-parent {
             width: 100vw;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: grab;
+            overflow: hidden;
             position: relative;
             z-index: 10;
-            padding-bottom: 50px; /* Espacio para que la barra no tape la imagen al inicio */
-            box-sizing: border-box;
         }
-        #panzoom-container:active { cursor: grabbing; }
 
+        /* --- LA IMAGEN (Ajuste Crítico) --- */
         .infografia-img {
-            max-width: 95%; 
+            /* Esto fuerza a que la imagen quepa en pantalla al inicio */
+            max-width: 90vw; 
             max-height: 85vh; 
             width: auto;
             height: auto;
             display: block;
             box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            /* Cursor */
+            cursor: grab;
         }
+        .infografia-img:active { cursor: grabbing; }
 
-        /* --- BARRA DE HERRAMIENTAS (Clonada de dFlip) --- */
+        /* --- BARRA DE HERRAMIENTAS --- */
         .custom-toolbar {
             position: fixed;
-            bottom: 30px; /* Misma altura que dFlip */
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 1000;
+            z-index: 9999; /* Z-Index muy alto para que no desaparezca */
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 10px 20px;
-            /* Fondo transparente como pediste */
             background: transparent; 
+            gap: 10px;
         }
 
-        /* --- BOTONES (Exactamente el mismo estilo CSS que STUPOR) --- */
         .tool-btn {
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
             color: var(--text-main) !important;
             border-radius: 0 !important; 
-            margin: 0 10px !important;
+            margin: 0 !important;
             transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             opacity: var(--ui-opacity);
-            width: 32px !important; /* Tamaño estándar dFlip */
-            height: 32px !important;
+            width: 36px !important; 
+            height: 36px !important;
             display: flex !important;
             align-items: center;
             justify-content: center;
-            font-size: 18px; /* Tamaño icono */
+            font-size: 20px; 
             cursor: pointer;
         }
 
-        /* Interacción: Color + Escala + Glow (Sin círculos) */
         .tool-btn:hover, .tool-btn.active {
             color: var(--accent-color) !important;
-            background: transparent !important;
-            opacity: 1 !important;
             transform: scale(1.4); 
             text-shadow: 0 0 15px rgba(221, 30, 37, 0.8); 
+            opacity: 1;
         }
 
-        /* --- VENTANA MODAL INFO (Estándar) --- */
+        /* --- MODAL --- */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(5px); z-index: 2000;
+            background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(5px); z-index: 10000;
             justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease;
         }
         .modal-overlay.show { display: flex; opacity: 1; }
-
-        .modal-content {
-            background: transparent; color: #fff; max-width: 500px; width: 80%;
-            text-align: center; position: relative;
-        }
+        .modal-content { background: transparent; color: #fff; max-width: 500px; width: 80%; text-align: center; position: relative; }
         .modal-line { width: 40px; height: 2px; background-color: var(--accent-color); margin: 20px auto; }
         .modal-title { font-size: 24px; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 3px; }
         .modal-subtitle { font-size: 11px; color: var(--accent-color); margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; }
         .modal-body { font-size: 14px; color: #ccc; line-height: 1.6; font-weight: 300; }
-        .modal-note { margin-top: 30px; font-size: 11px; color: #666; max-width: 90%; margin-left: auto; margin-right: auto; padding-top: 15px; border-top: 1px solid #222; }
+        .modal-note { margin-top: 30px; font-size: 10px; color: #666; border-top: 1px solid #222; padding-top: 15px; }
         .close-modal { position: absolute; top: -50px; right: 0; color: #666; font-size: 30px; cursor: pointer; transition: 0.2s; font-weight: 100; }
         .close-modal:hover { color: var(--accent-color); transform: scale(1.1); }
 
-        /* --- TOOLTIPS (Estilo Stupor) --- */
+        .ti-info-alt:before { content: "\e645"; }
+        
+        /* Tooltips */
         .tippy-box[data-theme~='stupor'] {
             background-color: #111; color: var(--accent-color); font-family: 'Archivo', sans-serif;
             font-weight: 700; font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
@@ -141,7 +132,7 @@
 
     <div id="grained-container"></div>
 
-    <!-- MODAL INFO -->
+    <!-- MODAL -->
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-modal" onclick="toggleInfo()">&times;</span>
@@ -159,37 +150,20 @@
         </div>
     </div>
 
-    <!-- ÁREA DE IMAGEN -->
-    <div id="panzoom-container">
-        <!-- ASEGÚRATE QUE EL NOMBRE SEA EXACTO -->
+    <!-- CONTENEDOR ZOOM -->
+    <div id="panzoom-parent">
+        <!-- Imagen -->
         <img class="infografia-img" id="panzoom-element" 
              src="FILMOGRAFIADAVIDLYNCH_InfografiaCompleta_WEB-FINAL_v01_18122025.png" 
              alt="Infografía David Lynch">
     </div>
 
-    <!-- BARRA DE HERRAMIENTAS (ESTÉTICA IDÉNTICA AL PDF) -->
+    <!-- BARRA -->
     <div class="custom-toolbar">
-        <!-- Zoom In -->
-        <button class="tool-btn" id="btn-in" data-tippy-content="ZOOM +">
-            <i class="ti-zoom-in"></i>
-        </button>
-        
-        <!-- Zoom Out -->
-        <button class="tool-btn" id="btn-out" data-tippy-content="ZOOM -">
-            <i class="ti-zoom-out"></i>
-        </button>
-        
-        <!-- Pantalla Completa -->
-        <button class="tool-btn" id="btn-full" onclick="toggleFullScreen()" data-tippy-content="PANTALLA COMPLETA">
-            <i class="ti-fullscreen"></i>
-        </button>
-        
-        <!-- Información (Separación visual sutil) -->
-        <div style="width: 15px;"></div> 
-
-        <button class="tool-btn" id="btn-info" onclick="toggleInfo()" data-tippy-content="INFORMACIÓN">
-            <i class="ti-info-alt"></i> <!-- Mismo icono 'i' que en los otros proyectos -->
-        </button>
+        <button class="tool-btn" id="btn-in" data-tippy-content="ZOOM +"><i class="ti-zoom-in"></i></button>
+        <button class="tool-btn" id="btn-out" data-tippy-content="ZOOM -"><i class="ti-zoom-out"></i></button>
+        <button class="tool-btn" id="btn-full" onclick="toggleFullScreen()" data-tippy-content="PANTALLA COMPLETA"><i class="ti-fullscreen"></i></button>
+        <button class="tool-btn" id="btn-info" onclick="toggleInfo()" data-tippy-content="INFORMACIÓN"><i class="ti-info-alt"></i></button>
     </div>
 
     <!-- SCRIPTS -->
@@ -199,30 +173,43 @@
     <script src="https://unpkg.com/tippy.js@6"></script>
 
     <script>
-        // 1. GRANO
-        try {
-            grained('#grained-container', {
-                "animate": true, "patternWidth": 100, "patternHeight": 100,
-                "grainOpacity": 0.08, "grainDensity": 1.5, "grainWidth": 1, "grainHeight": 1
+        // 1. INICIAR SCRIPT SOLO CUANDO TODO CARGUE (SOLUCIONA EL CENTRADO)
+        window.onload = function() {
+            
+            // a) Panzoom
+            const elem = document.getElementById('panzoom-element');
+            const panzoom = Panzoom(elem, {
+                maxScale: 10, 
+                minScale: 0.1, 
+                contain: 'outside', // Mantiene la imagen "contenida" pero explorable
+                startScale: 1
             });
-        } catch(e) {}
 
-        // 2. ZOOM
-        const elem = document.getElementById('panzoom-element');
-        const panzoom = Panzoom(elem, {
-            maxScale: 10, minScale: 0.1, contain: 'outside', startScale: 0.9, cursor: 'default'
-        });
-        elem.parentElement.addEventListener('wheel', panzoom.zoomWithWheel);
-        document.getElementById('btn-in').addEventListener('click', panzoom.zoomIn);
-        document.getElementById('btn-out').addEventListener('click', panzoom.zoomOut);
+            // Zoom con rueda
+            elem.parentElement.addEventListener('wheel', panzoom.zoomWithWheel);
 
-        // 3. FULLSCREEN
+            // Botones Zoom
+            document.getElementById('btn-in').addEventListener('click', panzoom.zoomIn);
+            document.getElementById('btn-out').addEventListener('click', panzoom.zoomOut);
+
+            // b) Grano
+            try {
+                grained('#grained-container', {
+                    "animate": true, "patternWidth": 100, "patternHeight": 100,
+                    "grainOpacity": 0.08, "grainDensity": 1.5, "grainWidth": 1, "grainHeight": 1
+                });
+            } catch(e) {}
+
+            // c) Tooltips
+            tippy('.tool-btn', { theme: 'stupor', animation: 'scale', placement: 'top', arrow: true });
+        };
+
+        // 2. FUNCIONES UI
         function toggleFullScreen() {
             if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); } 
             else { if (document.exitFullscreen) { document.exitFullscreen(); } }
         }
 
-        // 4. MODAL
         function toggleInfo() {
             const modal = document.getElementById('infoModal');
             const btn = document.getElementById('btn-info');
@@ -237,9 +224,6 @@
             }
         }
         window.onclick = function(event) { if (event.target == document.getElementById('infoModal')) toggleInfo(); }
-
-        // 5. TOOLTIPS
-        tippy('.tool-btn', { theme: 'stupor', animation: 'scale', placement: 'top', arrow: true });
     </script>
 
 </body>
